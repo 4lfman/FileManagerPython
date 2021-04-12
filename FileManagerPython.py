@@ -28,18 +28,20 @@ class MyHandler(FileSystemEventHandler):
 def HandleFile(src, new_destination, filename):
     def txt():
         print(filename + ":Was .txt")
-        renameToSubfolder(src, new_destination, 'txt', filename)
+        return 'txt'
 
     def picture():
         print(filename + ": Was a picture")
         os.rename(src, "C:/Users/Alfred/Desktop/ToSort/" + filename)
+        return None
 
     def zip():
         print(filename + ": Was a zip file")
+        return 'zip'
 
     def notAvalible():
-        print("That filetype is not avalible for now.")
-        renameToSubfolder(src, new_destination, 'unavalible', filename)        
+        print("{} filetype is not avalible for now.".format(extention))
+        return 'unavalible'
 
     extention = os.path.splitext(filename)[1]
     if extention in ['.png', '.jpeg', '.jpg', '.gif']: #Lumps all picture formats into one method
@@ -51,14 +53,12 @@ def HandleFile(src, new_destination, filename):
         'picture' : picture,
         '.zip' : zip
         }
-    dict.get(extention, notAvalible)()
+    filetype = dict.get(extention, notAvalible)() #Assigns the return of the method from the dict to 'filetype'
 
-#Automatically puts the file in to the correct folder and creates it if it doesn't exist
-def renameToSubfolder(src, new_destination, filetype, filename):
-    if not (os.path.isdir(new_destination + '/' + filetype)): #If the directory does not exist, create it
-        new_directory = (new_destination + '/' + filetype)
-        os.makedirs(new_directory)
-    os.rename(src, new_destination + '/' + filetype + '/' + filename) #Move the file/folder to the new directory
+    if filetype != None:
+        if not (os.path.isdir(new_destination + '/' + filetype)): #If the directory does not exist, create it
+            os.makedirs(new_destination + '/' + filetype)
+        os.rename(src, new_destination + '/' + filetype + '/' + filename) #Move the file/folder to the new directory
 
 folder_to_track = "/Users/Alfred/Desktop/AutoSort"
 folder_destination = "/Users/Alfred/Desktop/SortByFileType"
